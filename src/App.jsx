@@ -22,7 +22,7 @@ function App() {
   return (
     <>
       <Header />
-      <div className="flex flex-col border h-screen rounded-md w-[90%] mx-auto p-4 bg-tertiary gap-16">
+      <div className="flex flex-col border h-screen rounded-md w-[90%] mx-auto p-4 bg-tertiary gap-16 md:w-1/2 md:text-xl ">
         <div className="flex flex-col gap-4">
           <Form tasks={tasks} setTasks={setTasks} />
           <TodoList
@@ -39,7 +39,7 @@ function App() {
 
 function Header() {
   return (
-    <h1 className=" font-secondary text-white text-center text-3xl tracking-wide	my-4">
+    <h1 className=" font-secondary text-white text-center text-3xl tracking-wide	my-4 md:text-5xl">
       Taskinator
     </h1>
   );
@@ -84,21 +84,21 @@ function Form({ tasks, setTasks }) {
 }
 function TodoList({ tasks, deleteTask, toggleTaskCompleted, clearList }) {
   const [sortedList, setSortedList] = useState("input");
-  let sortedTasks;
-  if (sortedList === "input") sortedTasks = tasks;
-  if (sortedList === "description")
-    sortedTasks = tasks.slice().sort((a, b) => a.text.localeCompare(b.text));
-  if (sortedList === "completed")
-    sortedTasks = tasks
-      .slice()
-      .sort((a, b) => Number(a.completed) - Number(b.completed));
+  const sortedTasks = [...tasks];
+
+  if (sortedList === "description") {
+    sortedTasks.sort((a, b) => a.text.localeCompare(b.text));
+  } else if (sortedList === "completed") {
+    sortedTasks.sort((a, b) => a.completed - b.completed);
+  }
+
   return (
     <>
       <ul className=" p-4 flex flex-col gap-4 font-primary ">
         {sortedTasks.map((task) => (
           <li
             key={task.id}
-            className=" gap-4 flex justify-between items-center bg-secondary rounded-md p-3"
+            className=" gap-4 flex justify-between items-center bg-secondary rounded-md p-3 md:w-1/2 md:mx-auto"
           >
             <div className="flex items-center">
               <button
@@ -127,12 +127,26 @@ function TodoList({ tasks, deleteTask, toggleTaskCompleted, clearList }) {
       <div className="font-primary flex justify-around p-2">
         <select
           value={sortedList}
-          onChange={(e) => setSortedList(e.target.value)}
+          onChange={(event) => {
+            setSortedList(event.target.value);
+          }}
+          onBlur={() => {
+            setSortedList(event.target.value);
+          }}
+          onFocus={() => {
+            setSortedList(event.target.value);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              setSortedList(event.target.value);
+            }
+          }}
         >
           <option value="input">Sort by input order</option>
           <option value="description">Sort by description</option>
           <option value="completed">Sort by completed</option>
         </select>
+
         <button
           onClick={clearList}
           className="border rounded-md px-3 py-2 bg-extra font-semibold text-white"
